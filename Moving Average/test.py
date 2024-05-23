@@ -2,10 +2,15 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 
+stock = 'AMZN'
+start = '2015-01-01'
+stop = '2024-05-16'
+
 
 def getData(ticker, start_date, end_date):
     data = yf.download(ticker, start=start_date, end=end_date)
     #print(data.columns) # --> ['Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume']
+    data.dropna(inplace=True)  
     return data
 
 def calc50DayMovingAverage(df):
@@ -13,7 +18,7 @@ def calc50DayMovingAverage(df):
     return df
 
 def calcFuturePriceChange(df, interval):
-    df["FuturePriceChange"] = (df.Close / df.Close.shift(interval)) - 1
+    df["FuturePriceChange"] = (df.Close / df.Close.shift(-interval)) - 1
     return df
 
 def calcCorrelation(df):
@@ -21,11 +26,12 @@ def calcCorrelation(df):
     return correlation
 
 def main():
-    data = getData('AMZN', '2020-01-01', '2024-05-16')
+    interval = 365
+    data = getData(stock, start, stop)
     data = calc50DayMovingAverage(data)
-    data = calcFuturePriceChange(data, 20)
+    data = calcFuturePriceChange(data, interval)
     correlation = calcCorrelation(data)
-    print(f"Correlation of 50-Day Moving Average and % change in stock price over 20 days is: {correlation}")
+    print(f"Stock: {stock} \nCorrelation of 50-Day Moving Average and % change in stock price over {interval} days is: {correlation}")
 
 if __name__ == "__main__":
     main()
