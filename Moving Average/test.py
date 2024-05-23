@@ -21,7 +21,6 @@ def calc50DayMovingAverage(df):
     return df
 
 def calcFuturePriceChange(df, interval):
-    # worried this is wrong #df["FuturePriceChange"] = (df.Close / df.Close.shift(-interval)) - 1
     df["FuturePriceChange"] = (df.Close.shift(-interval) / df.Close) - 1
     return df
 
@@ -30,10 +29,10 @@ def calcCorrelation(df):
     return correlation
 
 def visualizeData(df, interval):
-    fig, axs = plt.subplots(2,1, figsize=(10, 7.5))
+    fig, axs = plt.subplots(3,1, figsize=(10, 7.5))
 
     axs[0].plot(df.index, df["50DayMovingAverage"], label='50 DMA', color='black')
-    axs[0].set_title("50 Day Moving Average")
+    axs[0].set_title(f"50 Day Moving Average, Stock: {stock}")
     axs[0].set_xlabel("Date")
     axs[0].set_ylabel("50 DMA")
     axs[0].legend()
@@ -43,6 +42,13 @@ def visualizeData(df, interval):
     axs[1].set_xlabel("Date")
     axs[1].set_ylabel("Percent Change In Price")
     axs[1].legend()
+
+    axs[2].scatter(df["FuturePriceChange"], df["50DayMovingAverage"], label='50 DMA vs Price Change', color = 'green')
+    axs[2].set_title("50 DMA vs Percent Change Over Next Year")
+    axs[2].set_xlabel("Price Percent Change")
+    axs[2].set_ylabel("50 DMA")
+    axs[2].legend()
+
 
     plt.tight_layout()
     plt.show()
