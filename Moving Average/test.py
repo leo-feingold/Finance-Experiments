@@ -31,7 +31,7 @@ def main():
     data = calc50DayMovingAverage(data)
     data = calcFuturePriceChange(data, interval)
     correlation = calcCorrelation(data)
-    print(f"Stock: {stock} \nCorrelation of 50-Day Moving Average and % change in stock price over {interval} days is: {correlation}")
+    print(f"Stock: {stock} \nCorrelation of 50-Day Moving Average and change in stock price over {interval} days is: {correlation}")
 
 if __name__ == "__main__":
     main()
