@@ -95,6 +95,7 @@ def determinePerformance(df, crossovers, crossover_others, interval):
             performanceTable["golden_cross"]["sell_date"].append(date + pd.DateOffset(days=interval))
             performanceTable["golden_cross"]["sell_price"].append(end_price)
             performanceTable["golden_cross"]["return"].append((end_price - start_price) / start_price)
+        else: print("bad1")
 
 
     for date in crossover_others:
@@ -107,6 +108,7 @@ def determinePerformance(df, crossovers, crossover_others, interval):
             performanceTable["death_cross"]["sell_date"].append(date + pd.DateOffset(days=interval))
             performanceTable["death_cross"]["sell_price"].append(end_price)
             performanceTable["death_cross"]["return"].append((end_price - start_price) / start_price)
+        else: print("bad2")
     
     summaryVis = {
         "golden_cross_avg_return": np.mean(performanceVis["golden_cross"]),
@@ -128,8 +130,7 @@ def main():
     data = calc200DMA(data)
     data = calc50DMA(data)
     data, dates, dates_other = findCriticalPoints(data)
-    summaryVis = determinePerformance(data, dates, dates_other, timeElapsed)[0]
-    table = determinePerformance(data, dates, dates_other, timeElapsed)[1]
+    summaryVis, table = determinePerformance(data, dates, dates_other, timeElapsed)
     chartPerformance(table)
     visualizeData(data, dates, dates_other, summaryVis)
 
