@@ -63,40 +63,76 @@ def visualizeData(df, crossovers, crossover_others, summary):
     plt.show()
 
 def determinePerformance(df, crossovers, crossover_others, interval):
-    performance = {
+    performanceVis = {
         "golden_cross": [],
         "death_cross": []
+    }
+
+    performanceTable = {
+        "golden_cross": {
+            "buy_date": [],
+            "buy_price": [],
+            "sell_date": [],
+            "sell_price": [],
+            "return": []
+        },
+        "death_cross": {
+            "buy_date": [],
+            "buy_price": [],
+            "sell_date": [],
+            "sell_price": [],
+            "return": []
+        }
     }
 
     for date in crossovers:
         if date + pd.DateOffset(days=interval) in df.index:
             start_price = df.loc[date, "Close"]
             end_price = df.loc[date + pd.DateOffset(days=interval), "Close"]
-            performance["golden_cross"].append((end_price - start_price) / start_price)
+            performanceVis["golden_cross"].append((end_price - start_price) / start_price)
+            performanceTable["golden_cross"]["buy_date"].append(date)
+            performanceTable["golden_cross"]["buy_price"].append(start_price)
+            performanceTable["golden_cross"]["sell_date"].append(date + pd.DateOffset(days=interval))
+            performanceTable["golden_cross"]["sell_price"].append(end_price)
+            performanceTable["golden_cross"]["return"].append((end_price - start_price) / start_price)
+
 
     for date in crossover_others:
         if date + pd.DateOffset(days=interval) in df.index:
             start_price = df.loc[date, "Close"]
             end_price = df.loc[date + pd.DateOffset(days=interval), "Close"]
-            performance["death_cross"].append((end_price - start_price) / start_price)
+            performanceVis["death_cross"].append((end_price - start_price) / start_price)
+            performanceTable["death_cross"]["buy_date"].append(date)
+            performanceTable["death_cross"]["buy_price"].append(start_price)
+            performanceTable["death_cross"]["sell_date"].append(date + pd.DateOffset(days=interval))
+            performanceTable["death_cross"]["sell_price"].append(end_price)
+            performanceTable["death_cross"]["return"].append((end_price - start_price) / start_price)
     
-    summary = {
-        "golden_cross_avg_return": np.mean(performance["golden_cross"]),
-        "golden_cross_median_return": np.median(performance["golden_cross"]),
-        "death_cross_avg_return": np.mean(performance["death_cross"]),
-        "death_cross_median_return": np.median(performance["death_cross"])
+    summaryVis = {
+        "golden_cross_avg_return": np.mean(performanceVis["golden_cross"]),
+        "golden_cross_median_return": np.median(performanceVis["golden_cross"]),
+        "death_cross_avg_return": np.mean(performanceVis["death_cross"]),
+        "death_cross_median_return": np.median(performanceVis["death_cross"])
     }
 
-    return summary
+    return summaryVis, performanceTable
 
+def chartPerformance(performanceTable):
+    golden_cross_df = pd.DataFrame(performanceTable["golden_cross"])
+    death_cross_df = pd.DataFrame(performanceTable["death_cross"])
+    golden_cross_df.to_csv('golden_cross_data.csv', index=False)
+    death_cross_df.to_csv('death_cross_data.csv', index=False)
 
 def main():
     data = loadData(stock, start, stop)
     data = calc200DMA(data)
     data = calc50DMA(data)
     data, dates, dates_other = findCriticalPoints(data)
-    summary = determinePerformance(data, dates, dates_other, timeElapsed)
-    visualizeData(data, dates, dates_other, summary)
+    summaryVis = determinePerformance(data, dates, dates_other, timeElapsed)[0]
+    table = determinePerformance(data, dates, dates_other, timeElapsed)[1]
+    chartPerformance(table)
+    visualizeData(data, dates, dates_other, summaryVis)
+
 
 if __name__ == "__main__":
     main()
