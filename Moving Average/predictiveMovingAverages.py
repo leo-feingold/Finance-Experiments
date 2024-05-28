@@ -56,8 +56,7 @@ def visualizeData(df, interval, corr):
     axs[2].set_ylabel("Normalized 50 DMA")
     axs[2].legend()
 
-
-    fig.suptitle(f"Stock: {stock}, Correlation: {corr:.2f}", fontsize=16)
+    fig.suptitle(f"Stock: {stock}, Correlation: {corr:.2f}, r^2: {corr**2:.2f}", fontsize=16)
     plt.tight_layout()
     plt.show()
 
