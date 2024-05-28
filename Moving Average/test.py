@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-stock = 'AAPL'
+stock = 'IBM'
 start = '2015-01-01'
 stop = '2024-05-16'
 
@@ -16,8 +16,8 @@ def getData(ticker, start_date, end_date):
     return data
 
 def calc50DayMovingAverage(df):
-    # I think I need to normalize this
     df["50DayMovingAverage"] = df.Close.rolling(window=50).mean()
+    df["Normalized_50DayMovingAverage"] = df["50DayMovingAverage"]/df["Close"]
     return df
 
 def calcFuturePriceChange(df, interval):
@@ -25,13 +25,13 @@ def calcFuturePriceChange(df, interval):
     return df
 
 def calcCorrelation(df):
-    correlation = df[["50DayMovingAverage", "FuturePriceChange"]].corr().iloc[0, 1]
+    correlation = df[["Normalized_50DayMovingAverage", "FuturePriceChange"]].corr().iloc[0, 1]
     return correlation
 
 def visualizeData(df, interval):
     fig, axs = plt.subplots(3,1, figsize=(10, 7.5))
 
-    axs[0].plot(df.index, df["50DayMovingAverage"], label='50 DMA', color='black')
+    axs[0].plot(df.index, df["Normalized_50DayMovingAverage"], label='50 DMA', color='black')
     axs[0].set_title(f"50 Day Moving Average, Stock: {stock}")
     axs[0].set_xlabel("Date")
     axs[0].set_ylabel("50 DMA")
@@ -43,8 +43,8 @@ def visualizeData(df, interval):
     axs[1].set_ylabel("Percent Change In Price")
     axs[1].legend()
 
-    axs[2].scatter(df["FuturePriceChange"], df["50DayMovingAverage"], label='50 DMA vs Price Change', color = 'green')
-    axs[2].set_title("50 DMA vs Percent Change Over Next Year")
+    axs[2].scatter(df["FuturePriceChange"], df["Normalized_50DayMovingAverage"], label='50 DMA vs Price Change', color = 'green')
+    axs[2].set_title(f"50 DMA vs Percent Change Over Next {interval} Days")
     axs[2].set_xlabel("Price Percent Change")
     axs[2].set_ylabel("50 DMA")
     axs[2].legend()
@@ -55,12 +55,12 @@ def visualizeData(df, interval):
 
 
 def main():
-    interval = 365
+    interval = 30
     data = getData(stock, start, stop)
     data = calc50DayMovingAverage(data)
     data = calcFuturePriceChange(data, interval)
     correlation = calcCorrelation(data)
-    print(f"Stock: {stock} \nCorrelation of 50-Day Moving Average and change in stock price over {interval} days is: {correlation}")
+    print(f"Stock: {stock} \nCorrelation of normalized 50-day moving average and change in stock price over {interval} days is: {correlation}")
     visualizeData(data, interval)
 
 if __name__ == "__main__":
