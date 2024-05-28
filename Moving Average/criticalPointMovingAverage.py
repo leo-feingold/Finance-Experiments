@@ -35,14 +35,14 @@ def findCriticalPoints(df):
 def visualizeData(df, crossovers):
     fig, axs = plt.subplots(1,1, figsize=(10, 7.5))
 
-    axs.plot(df.index, df.Close, label="Stock Price", color="black")
+    axs.plot(df.index, df.Close, label="Stock Price", color="red", zorder=1)
+    axs.scatter(crossovers, df.loc[crossovers, "Close"], label="Golden Cross", color="black", zorder=2)
     axs.set_title("Stock Price Over Time")
     axs.set_xlabel("Date")
     axs.set_ylabel("Price")
-    axs.scatter(crossovers, df.loc[crossovers, "Close"], label="Golden Cross", color="yellow")
     axs.legend()
     fig.suptitle(f"Stock: {stock}, Golden Crosses")
-    plt.show
+    plt.show()
 
 
 
