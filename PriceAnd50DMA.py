@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-stock = 'QQQ'
-start = '2020-01-01'
+stock = 'SPY'
+start = '2015-01-01'
 stop = '2024-05-27'
 
 def loadData(ticker, start_date, end_date):
