@@ -32,9 +32,11 @@ def interestingPoint(df):
 
 def visualizeData(df, crossovers, crossover_others):
     fig, axs = plt.subplots(1,1, figsize=(10, 7.5))
-    axs.scatter(crossovers, df.loc[crossovers, "Close"], label='Price Passes 50 DMA', color = 'green', zorder = 2)
-    axs.scatter(crossover_others, df.loc[crossover_others, "Close"], label='Price Falls Under 50 DMA', color='red', zorder=3)
+    axs.scatter(crossovers, df.loc[crossovers, "Close"], label='Price Passes 50 DMA', color = 'green', zorder = 4)
+    axs.scatter(crossover_others, df.loc[crossover_others, "Close"], label='Price Falls Under 50 DMA', color='red', zorder=5)
     axs.plot(df.index, df.Close, label='Stock Price', color='black', zorder=1)
+    axs.plot(df.index, df["50DMA"], label='50 DMA', color='blue', linestyle='--', zorder=2)
+
     axs.set_xlabel("Date")
     axs.set_ylabel("Price")
     axs.set_title("Stock Price Over Time")
