@@ -6,7 +6,7 @@ import seaborn as sns
 
 show_moving_averages = False
 timeElapsed = 25
-stock = 'SPY'
+stock = 'QQQ'
 start = '2000-01-01'
 stop = '2024-05-27'
 
