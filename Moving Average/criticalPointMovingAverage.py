@@ -23,6 +23,13 @@ def calc200DMA(df):
     df["200DMA"] = df.Close.rolling(window=200).mean()
     return df
 
+def find_nearest_date(df, target_date):
+    time_diff = np.abs(df.index - target_date)
+    closest_index = time_diff.argmin()
+    closest_date = df.index[closest_index]
+    return closest_date
+
+
 def findCriticalPoints(df):
     df["50Over200"] = df["50DMA"] > df["200DMA"]
     df["Crossover"] = (df["50Over200"] == True) & (df["50Over200"].shift(1) == False)
@@ -86,29 +93,35 @@ def determinePerformance(df, crossovers, crossover_others, interval):
     }
 
     for date in crossovers:
-        if date + pd.DateOffset(days=interval) in df.index:
+        new_date = date + pd.DateOffset(days=interval)
+        new_date = find_nearest_date(df, new_date)
+        if new_date in df.index:
+            print(f"Golden Cross, Working: {new_date}")
             start_price = df.loc[date, "Close"]
-            end_price = df.loc[date + pd.DateOffset(days=interval), "Close"]
+            end_price = df.loc[new_date, "Close"]
             performanceVis["golden_cross"].append((end_price - start_price) / start_price)
             performanceTable["golden_cross"]["buy_date"].append(date)
             performanceTable["golden_cross"]["buy_price"].append(start_price)
-            performanceTable["golden_cross"]["sell_date"].append(date + pd.DateOffset(days=interval))
+            performanceTable["golden_cross"]["sell_date"].append(new_date)
             performanceTable["golden_cross"]["sell_price"].append(end_price)
             performanceTable["golden_cross"]["return"].append((end_price - start_price) / start_price)
-        else: print("bad1")
+        else: print(f"Golden Cross, Bad: {new_date}")
 
 
     for date in crossover_others:
-        if date + pd.DateOffset(days=interval) in df.index:
+        new_date = date + pd.DateOffset(days=interval)
+        new_date = find_nearest_date(df, new_date)
+        if new_date in df.index:
+            print(f"Death Cross, Working: {new_date}")
             start_price = df.loc[date, "Close"]
-            end_price = df.loc[date + pd.DateOffset(days=interval), "Close"]
+            end_price = df.loc[new_date, "Close"]
             performanceVis["death_cross"].append((end_price - start_price) / start_price)
             performanceTable["death_cross"]["buy_date"].append(date)
             performanceTable["death_cross"]["buy_price"].append(start_price)
-            performanceTable["death_cross"]["sell_date"].append(date + pd.DateOffset(days=interval))
+            performanceTable["death_cross"]["sell_date"].append(new_date)
             performanceTable["death_cross"]["sell_price"].append(end_price)
             performanceTable["death_cross"]["return"].append((end_price - start_price) / start_price)
-        else: print("bad2")
+        else: print(f"Death Cross, Bad: {new_date}")
     
     summaryVis = {
         "golden_cross_avg_return": np.mean(performanceVis["golden_cross"]),
