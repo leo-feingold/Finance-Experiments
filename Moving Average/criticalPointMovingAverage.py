@@ -135,8 +135,8 @@ def determinePerformance(df, crossovers, crossover_others, interval):
 def chartPerformance(performanceTable):
     golden_cross_df = pd.DataFrame(performanceTable["golden_cross"])
     death_cross_df = pd.DataFrame(performanceTable["death_cross"])
-    golden_cross_df.to_csv('golden_cross_data.csv', index=False)
-    death_cross_df.to_csv('death_cross_data.csv', index=False)
+    golden_cross_df.to_csv(f'{stock}_golden_cross_data.csv', index=False)
+    death_cross_df.to_csv(f'{stock}_death_cross_data.csv', index=False)
 
 def main():
     data = loadData(stock, start, stop)
