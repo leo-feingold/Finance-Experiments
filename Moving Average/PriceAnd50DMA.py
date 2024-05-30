@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 stock = 'SPY'
 start = '2015-01-01'
-stop = '2024-05-27'
+stop = '2024-05-29'
 
 def loadData(ticker, start_date, end_date):
     df = yf.download(ticker, start=start_date, end=end_date)
@@ -27,7 +27,8 @@ def interestingPoint(df):
 
     crossover_dates = df.index[df["Crossover"]].tolist()
     crossover_other_dates = df.index[df["CrossoverOther"]].tolist()
-    print(crossover_dates,'\n',crossover_other_dates)
+    #data = pd.DataFrame(crossover_other_dates)
+    # looks about right #print(data)
     return df, crossover_dates, crossover_other_dates
 
 def visualizeData(df, crossovers, crossover_others):
@@ -35,7 +36,7 @@ def visualizeData(df, crossovers, crossover_others):
     axs.scatter(crossovers, df.loc[crossovers, "Close"], label='Price Passes 50 DMA', color = 'green', zorder = 4)
     axs.scatter(crossover_others, df.loc[crossover_others, "Close"], label='Price Falls Under 50 DMA', color='red', zorder=5)
     axs.plot(df.index, df.Close, label='Stock Price', color='black', zorder=1)
-    axs.plot(df.index, df["50DMA"], label='50 DMA', color='blue', linestyle='--', zorder=2)
+    #axs.plot(df.index, df["50DMA"], label='50 DMA', color='blue', linestyle='--', zorder=2)
 
     axs.set_xlabel("Date")
     axs.set_ylabel("Price")
@@ -45,6 +46,37 @@ def visualizeData(df, crossovers, crossover_others):
     plt.tight_layout()
     plt.show()
 
+def findNextSellDay(df, buy_date, crossover_others):
+    future_crossover_others = [date for date in crossover_others if date > buy_date]
+    if not future_crossover_others:
+        return df.index[-1]
+    return min(future_crossover_others)
+
+
+def buySell(df, crossovers, crossover_others):
+    performanceTable = {
+            "buy_date": [],
+            "buy_price": [],
+            "sell_date": [],
+            "sell_price": [],
+            "return_%": []
+    }
+
+    for date in crossovers:
+        sell_date = findNextSellDay(df, date, crossover_others)
+        sell_price = df.loc[sell_date, "Close"]
+        buy_price = df.loc[date, "Close"]
+        performanceTable["buy_date"].append(date)
+        performanceTable["buy_price"].append(buy_price)
+        performanceTable["sell_date"].append(sell_date)
+        performanceTable["sell_price"].append(sell_price)
+        performanceTable["return_%"].append(((sell_price - buy_price)/buy_price) * 100)
+
+    df = pd.DataFrame(performanceTable)
+    # looks about right #print(df["sell_date"])
+    df.to_csv("PriceAnd50DMA.csv", index=False)
+    return df
+
 
 
 def main():
@@ -53,6 +85,7 @@ def main():
     data = calc50DMA(data)
     data, crossover_dates, crossover_other_dates = interestingPoint(data)
     visualizeData(data, crossover_dates, crossover_other_dates)
+    buySell(data, crossover_dates, crossover_other_dates)
 
 if __name__ == "__main__":
     main()
